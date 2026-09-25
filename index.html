@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Black Continuity | Prototype v0.5.11</title>
+<style>
+:root{--ink:#080807;--paper:#eee6d6;--paper2:#f7f1e5;--gold:#c99b45;--muted:#b8ae9b;--line:#453a29}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--ink);color:#f7f1e5;font-family:Georgia,"Times New Roman",serif}
+a{color:inherit}.wrap{width:min(1160px,92%);margin:auto}
+header{position:absolute;z-index:10;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:26px 4vw;background:linear-gradient(#000c,transparent)}
+.brand{font:700 11px Arial,sans-serif;letter-spacing:.22em;line-height:1.45}.nav{display:flex;align-items:center;gap:22px;font:700 11px Arial,sans-serif;letter-spacing:.05em}.nav a{text-decoration:none}.nav .pill{border:1px solid #d8bd7a;padding:10px 13px}
+.hero{min-height:100vh;position:relative;display:flex;align-items:center;background:#070706 url("bcpg_hero_v0.3.png") center/cover no-repeat;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#050505f2 0%,#050505bd 28%,#05050558 57%,#05050518 78%),linear-gradient(0deg,#080807 0%,transparent 28%)}
+.hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 73% 43%,transparent 0 20%,#0003 58%,#0008 100%)}
+.heroInner{position:relative;z-index:2;width:min(1160px,92%);margin:auto;padding-top:72px}
+.status{display:inline-flex;gap:9px;align-items:center;font:700 11px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#e4c47e;border:1px solid #7d6333;background:#080705a8;padding:9px 12px}
+.dot{width:7px;height:7px;border-radius:50%;background:#d4a64d;box-shadow:0 0 15px #d4a64d}
+h1{font-size:clamp(4.5rem,10vw,9.5rem);font-weight:500;line-height:.78;letter-spacing:-.055em;margin:.22em 0 .18em;max-width:840px;text-shadow:0 5px 35px #000}
+.hero p{font-size:clamp(1.2rem,2vw,1.75rem);line-height:1.35;max-width:610px;text-shadow:0 3px 20px #000}
+.actions{display:flex;gap:13px;flex-wrap:wrap;margin-top:30px}.btn{display:inline-block;text-decoration:none;text-transform:uppercase;font:700 11px Arial,sans-serif;letter-spacing:.1em;padding:14px 18px;border:1px solid #eee}.btn.gold{background:var(--gold);border-color:var(--gold);color:#0c0a07}.scroll{position:absolute;z-index:3;bottom:20px;left:50%;transform:translateX(-50%);font:700 10px Arial,sans-serif;letter-spacing:.17em;text-transform:uppercase;text-align:center;color:#c8beac}.scroll b{font-size:22px;display:block;margin-top:5px}
+section{padding:90px 0}.paper{background:var(--paper);color:#18140f}.paper2{background:var(--paper2);color:#18140f}.dark{background:#100e0b}.black{background:#070706}
+.kicker{font:700 10px Arial,sans-serif;letter-spacing:.19em;text-transform:uppercase;color:#9a712b}.dark .kicker,.black .kicker{color:#d4aa58}
+h2{font-weight:500;font-size:clamp(2.6rem,5.5vw,5rem);line-height:.98;letter-spacing:-.035em;margin:.15em 0 .4em}.lead{font-size:1.18rem;line-height:1.7;max-width:790px;color:#51493d}.dark .lead,.black .lead{color:#c8beae}
+.center{text-align:center}.center .lead{margin-left:auto;margin-right:auto}
+.production{display:grid;grid-template-columns:1.15fr .85fr;gap:55px;align-items:center}.journey{border:1px solid #58472e;background:#16120d;padding:34px}.journeyRow{padding:15px 0;border-bottom:1px solid #3e3426;display:flex;justify-content:space-between;font:700 11px Arial,sans-serif;letter-spacing:.08em}.journeyRow:last-child{border:0}.journeyRow span:last-child{color:#d3ad62}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#cbbda5;margin-top:40px}.card{background:#fbf6eb;padding:30px;min-height:260px}.card h3{font-size:1.55rem;margin:.6em 0}.card p{line-height:1.6;color:#554d42}
+.collections{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:42px}.collection{min-height:330px;padding:25px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;background:linear-gradient(145deg,#332818,#090807);border:1px solid #59482e}.collection:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 25%,#b58b3b33,transparent 35%),repeating-linear-gradient(25deg,#fff0 0 20px,#b8955430 21px,#fff0 22px 44px);opacity:.65}.collection>*{position:relative}.collection small{font:700 10px Arial,sans-serif;letter-spacing:.14em;color:#d4ad61;text-transform:uppercase}.collection h3{font-size:1.8rem;margin:.35em 0}.collection p{color:#bdb3a3;line-height:1.5}
+.questionBox{max-width:850px;margin:38px auto 0;border:1px solid #a18a62;padding:30px;background:#f8f1e4}.questionBox textarea{width:100%;min-height:130px;padding:18px;border:1px solid #b7a88e;background:#fffdf7;font:1rem Georgia,serif;resize:vertical}.chips{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.chip{border:1px solid #a99673;padding:8px 10px;font:700 10px Arial,sans-serif;letter-spacing:.05em;background:#eee3d1}.note{font:12px Arial,sans-serif;color:#716757;line-height:1.5}
+.community{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:center}.forumMock{border:1px solid #4e422f;background:#13100c;padding:25px}.thread{padding:18px 0;border-bottom:1px solid #30291f}.thread:last-child{border:0}.thread strong{display:block;font-size:1.05rem}.thread span{font:11px Arial,sans-serif;color:#a99d89}
+.signup{max-width:820px;margin:auto;text-align:center}.signupBox{margin-top:30px;display:flex;gap:10px;justify-content:center}.signupBox input{min-width:280px;padding:14px;border:1px solid #756343;background:#15110c;color:white}.signupBox button{border:0;background:var(--gold);padding:14px 20px;font:700 11px Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.trust{font-size:clamp(2rem,4vw,3.5rem);max-width:900px;line-height:1.15}.goldline{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin:28px 0}
+footer{padding:42px 4vw;background:#030303;color:#918979;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font:11px Arial,sans-serif;letter-spacing:.05em}
+@media(max-width:900px){.nav a:not(.pill){display:none}.production,.community{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.collections{grid-template-columns:1fr 1fr}.hero{background-position:62% center}.hero:before{background:linear-gradient(90deg,#050505ee,#05050560),linear-gradient(0deg,#080807,transparent 30%)}}
+@media(max-width:560px){.collections{grid-template-columns:1fr}.signupBox{flex-direction:column}.signupBox input{min-width:0;width:100%}}
+
+.site-header{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:18px 5vw;background:linear-gradient(#050708e8,#05070800);color:#fff}.site-header a{color:inherit;text-decoration:none}.brand{font-weight:800;letter-spacing:.12em}.site-header nav{display:flex;gap:24px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}.hero{min-height:100vh;background-size:cover;background-position:center;display:flex;align-items:center;color:#fff}.hero-inner{width:min(1100px,90vw);margin:auto;padding-top:70px}.hero h1{font-size:clamp(4.2rem,12vw,10rem);line-height:.76;margin:.18em 0;letter-spacing:-.055em}.hero-line{font-size:clamp(1.4rem,2.6vw,2.3rem);max-width:720px}.hero-copy{max-width:650px;font-size:1.08rem;line-height:1.65}.eyebrow,.kicker{font-size:.75rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0}.button{display:inline-block;padding:14px 20px;background:#eee7d8;color:#111;text-decoration:none;font-weight:800;letter-spacing:.06em;font-size:.78rem}.button.secondary{background:transparent;color:#fff;border:1px solid #fff}.scroll-cue{margin-top:60px;font-size:.68rem;letter-spacing:.16em}.paper,.collections,.research,.dark{padding:90px max(5vw,24px)}.paper{background:#eee7d8;color:#171511}.dark,.research{background:#0d0e0f;color:#f1ede3}.intro h2,.paper h2,.collections h2,.dark h2,.research h2{font-size:clamp(2.5rem,5vw,5rem);line-height:.95;margin:.2em 0 .45em}.lead{font-size:1.2rem;line-height:1.7;max-width:900px}.three,.cards,.community-grid,.collection-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}.three article,.cards article,.community-grid article{border-top:1px solid #847d70;padding-top:20px}.collection-grid{grid-template-columns:repeat(2,1fr)}.collections{background:#181713;color:#eee7d8}.collection-grid article{min-height:210px;border:1px solid #504a40;padding:28px}.collection-grid span{font-size:.65rem;letter-spacing:.15em}.community-grid{grid-template-columns:repeat(2,1fr)}.community-grid article{padding-right:20px}.manifesto{margin-top:45px;padding:28px 0;border-top:1px solid #847d70;border-bottom:1px solid #847d70;font-size:clamp(1.2rem,2.5vw,2.1rem);letter-spacing:.05em}.steps{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:35px 0}.steps span{border:1px solid #777;padding:10px 12px;font-size:.72rem;letter-spacing:.08em}.benefits{display:flex;flex-wrap:wrap;gap:9px;margin:30px 0}.benefits span{border:1px solid #847d70;padding:9px 12px;font-size:.78rem}.join-form{display:flex;gap:8px;flex-wrap:wrap}.join-form input{padding:15px;border:1px solid #8a8377;background:#f7f2e8;min-width:220px}.join-form button{padding:15px 20px;border:0;background:#111;color:#fff;font-weight:800}.fine,.note{font-size:.8rem;opacity:.7;margin-top:16px}.rule{margin-top:30px;font-weight:800;letter-spacing:.1em}.final{text-align:center}.final .lead{margin-left:auto;margin-right:auto}.darkbutton{background:#111;color:#fff;margin-top:20px}footer{display:flex;justify-content:space-between;gap:20px;padding:30px 5vw;background:#050708;color:#aaa;font-size:.72rem;letter-spacing:.08em}@media(max-width:800px){.site-header nav{display:none}.three,.cards,.community-grid,.collection-grid{grid-template-columns:1fr}.hero h1{font-size:20vw}.paper,.collections,.research,.dark{padding-top:65px;padding-bottom:65px}footer{flex-direction:column}}
+
+
+/* v0.5 — cinematic archival interaction layer. Copy and visual identity remain BCPG's. */
+:root{--reveal-distance:72px}
+body{overflow-x:hidden}
+.site-header{transition:background .45s ease,backdrop-filter .45s ease,border-color .45s ease;border-bottom:1px solid transparent}
+.site-header.scrolled{background:rgba(5,7,8,.9);backdrop-filter:blur(10px);border-bottom-color:rgba(201,155,69,.18)}
+.hero{position:relative;isolation:isolate;background-attachment:fixed}
+.hero:before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(90deg,rgba(5,7,8,.78),rgba(5,7,8,.38) 52%,rgba(5,7,8,.65)),linear-gradient(0deg,rgba(8,8,7,.72),transparent 38%);pointer-events:none}
+.hero:after{content:"";position:absolute;inset:-8%;z-index:0;background:radial-gradient(circle at 67% 44%,rgba(201,155,69,.11),transparent 31%);opacity:.75;pointer-events:none;animation:archiveGlow 8s ease-in-out infinite alternate}
+.hero-inner{position:relative;z-index:1;will-change:transform,opacity}
+.hero h1{transform-origin:left center}
+.scroll-cue{animation:cue 2.2s ease-in-out infinite}
+@keyframes cue{0%,100%{transform:translateY(0);opacity:.62}50%{transform:translateY(8px);opacity:1}}
+@keyframes archiveGlow{from{transform:scale(1);opacity:.45}to{transform:scale(1.06);opacity:.8}}
+.reveal{opacity:0;transform:translateY(var(--reveal-distance));transition:opacity 1.15s cubic-bezier(.2,.7,.2,1),transform 1.15s cubic-bezier(.2,.7,.2,1)}
+.reveal.is-visible{opacity:1;transform:none}
+.reveal-stagger>*{opacity:0;transform:translateY(28px);transition:opacity .72s ease,transform .72s ease}
+.reveal-stagger.is-visible>*{opacity:1;transform:none}
+.reveal-stagger.is-visible>*:nth-child(2){transition-delay:.09s}.reveal-stagger.is-visible>*:nth-child(3){transition-delay:.18s}.reveal-stagger.is-visible>*:nth-child(4){transition-delay:.27s}.reveal-stagger.is-visible>*:nth-child(5){transition-delay:.36s}
+#history{position:relative;overflow:hidden}
+#history:before{content:"ARCHIVE / DISCOVERY";position:absolute;right:-.1em;top:.35em;font:800 clamp(4rem,12vw,10rem)/1 Arial,sans-serif;letter-spacing:-.06em;color:rgba(24,20,15,.035);pointer-events:none;white-space:nowrap}
+.cards article{transition:transform .45s ease,border-color .45s ease}.cards article:hover{transform:translateY(-6px);border-color:var(--gold)}
+.collections{position:relative;overflow:hidden;background:#070706}
+.collections:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 10%,rgba(201,155,69,.09),transparent 36%);pointer-events:none}
+.collections>*{position:relative}.collection-grid article{background:linear-gradient(145deg,#18140f,#0b0a08);transition:transform .5s ease,border-color .5s ease,background .5s ease}.collection-grid article:hover{transform:translateY(-7px);border-color:#9b7b43;background:linear-gradient(145deg,#211a10,#0b0a08)}
+.collection-subline{font-size:clamp(1.25rem,2vw,1.7rem);color:#c9bda8;max-width:760px;margin:-.5em 0 1.6em}
+.community{position:relative}.community:before{content:"";position:absolute;left:5vw;right:5vw;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.55}
+.community-subline{font-size:clamp(1.35rem,2.5vw,2rem);line-height:1.35;max-width:800px;margin:.2em 0 1em;color:#40382e}
+.manifesto strong{display:inline-block;transition:letter-spacing .5s ease}.manifesto:hover strong{letter-spacing:.08em}
+.research{position:relative;overflow:hidden}.research:after{content:"EVIDENCE";position:absolute;right:-.05em;bottom:-.18em;font:800 clamp(5rem,16vw,13rem)/1 Arial,sans-serif;color:rgba(238,231,216,.025);letter-spacing:-.06em;pointer-events:none}
+@media(max-width:800px){.hero{background-attachment:scroll}.hero:after{inset:0}.reveal{--reveal-distance:26px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero:after,.scroll-cue{animation:none}.reveal,.reveal-stagger>*,.site-header,.cards article,.collection-grid article{transition:none!important}.reveal,.reveal-stagger>*{opacity:1!important;transform:none!important}.hero-inner{transform:none!important;opacity:1!important}}
+
+
+/* v0.5.1 visibility + cinematic entrance correction */
+.hero{background-image:url('bcpg_hero_v0.4.png')!important;background-position:center center;background-size:cover;min-height:100vh}
+.hero:before{background:linear-gradient(90deg,rgba(5,7,8,.48) 0%,rgba(5,7,8,.25) 38%,rgba(5,7,8,.10) 68%,rgba(5,7,8,.32) 100%),linear-gradient(0deg,rgba(5,7,8,.50) 0%,transparent 35%)!important}
+.hero:after{background:radial-gradient(circle at 67% 44%,rgba(201,155,69,.10),transparent 36%)!important}
+.hero-inner{animation:heroEntrance 1.35s cubic-bezier(.2,.75,.2,1) both}
+.hero h1{animation:titleEntrance 1.55s .12s cubic-bezier(.16,.8,.2,1) both}
+.hero .eyebrow,.hero .hero-line,.hero .hero-copy,.hero .actions,.hero .scroll-cue{animation:copyEntrance 1.15s .42s cubic-bezier(.2,.75,.2,1) both}
+@keyframes heroEntrance{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes titleEntrance{from{opacity:0;transform:translateY(44px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes copyEntrance{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.hero-inner,.hero h1,.hero .eyebrow,.hero .hero-line,.hero .hero-copy,.hero .actions,.hero .scroll-cue{animation:none!important}}
+
+/* v0.5.2 — hero composition: preserve image, reduce text collision, staged cinematic entrance */
+.hero{align-items:flex-end!important;padding-bottom:7vh}
+.hero:before{background:linear-gradient(90deg,rgba(5,7,8,.62) 0%,rgba(5,7,8,.24) 32%,rgba(5,7,8,.03) 62%,rgba(5,7,8,.16) 100%),linear-gradient(0deg,rgba(5,7,8,.72) 0%,rgba(5,7,8,.16) 38%,transparent 62%)!important}
+.hero-inner{width:min(1180px,90vw)!important;margin:0 auto!important;padding:0!important;animation:none!important}
+.hero .eyebrow{display:inline-block;margin-bottom:12px;padding:8px 11px;background:rgba(7,7,6,.58);backdrop-filter:blur(5px);font-size:.72rem}
+.hero h1{font-size:clamp(2.8rem,5.4vw,5.4rem)!important;line-height:.88!important;letter-spacing:-.035em!important;margin:.04em 0 .12em!important;max-width:760px;text-shadow:0 4px 24px rgba(0,0,0,.72)}
+.hero h1 span{display:inline-block}
+.hero-line{font-size:clamp(1.35rem,2.1vw,2rem)!important;max-width:610px!important;margin:.25em 0!important;text-shadow:0 3px 18px #000}
+.hero-copy{max-width:600px!important;font-size:1rem!important;line-height:1.5!important;margin:.65em 0 0!important;text-shadow:0 3px 18px #000}
+.hero .actions{margin:20px 0 0!important}
+.hero .scroll-cue{position:absolute;left:50%;bottom:-3.5vh;transform:translateX(-50%);margin:0!important;white-space:nowrap}
+.hero .eyebrow{animation:heroStage .8s .15s both!important}
+.hero h1{animation:heroStage .95s .48s both!important}
+.hero .hero-line{animation:heroStage .9s .82s both!important}
+.hero .hero-copy{animation:heroStage .9s 1.08s both!important}
+.hero .actions{animation:heroStage .9s 1.34s both!important}
+.hero .scroll-cue{animation:heroStage .9s 1.65s both!important}
+@keyframes heroStage{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:800px){.hero{padding-bottom:9vh}.hero h1{font-size:clamp(2.8rem,14vw,4.5rem)!important}.hero .scroll-cue{bottom:-5vh}.hero:before{background:linear-gradient(90deg,rgba(5,7,8,.55),rgba(5,7,8,.10)),linear-gradient(0deg,rgba(5,7,8,.76),transparent 55%)!important}}
+@media(prefers-reduced-motion:reduce){.hero .eyebrow,.hero h1,.hero .hero-line,.hero .hero-copy,.hero .actions,.hero .scroll-cue{animation:none!important}}
+
+/* v0.5.3 — clean hero-to-content handoff; prevent hero copy from drifting into next section */
+.hero{min-height:100svh!important;padding-bottom:12vh!important;overflow:hidden!important}
+.hero-inner{align-self:flex-end;transform:none}
+.hero .scroll-cue{bottom:3.2vh!important}
+@media(max-height:820px) and (min-width:801px){
+  .hero{padding-bottom:8vh!important}
+  .hero h1{font-size:clamp(2.5rem,4.5vw,4.5rem)!important}
+  .hero-line{font-size:clamp(1.15rem,1.7vw,1.65rem)!important}
+  .hero-copy{font-size:.92rem!important;line-height:1.4!important;max-width:560px!important}
+  .hero .actions{margin-top:14px!important}
+}
+@media(max-width:800px){.hero{padding-bottom:12vh!important}.hero .scroll-cue{bottom:2.5vh!important}}
+
+
+/* v0.5.5 — hero is a complete opening screen; no next-section bleed-through */
+.hero{
+  height:100vh!important;
+  min-height:720px!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  position:relative!important;
+  z-index:2!important;
+}
+.hero + section{
+  position:relative!important;
+  z-index:3!important;
+  margin-top:0!important;
+  background:#eee7d8!important;
+  opacity:1;
+}
+@supports (height:100dvh){
+  .hero{height:100dvh!important;min-height:720px!important}
+}
+@media(max-height:760px) and (min-width:801px){
+  .hero{height:100vh!important;min-height:100vh!important;padding-bottom:7vh!important}
+  .hero .eyebrow{margin-bottom:7px!important;padding:6px 9px!important}
+  .hero h1{font-size:clamp(2.35rem,4vw,3.9rem)!important}
+  .hero-line{font-size:clamp(1.05rem,1.5vw,1.4rem)!important}
+  .hero-copy{font-size:.86rem!important;line-height:1.32!important;max-width:540px!important}
+  .hero .actions{margin-top:10px!important}
+  .hero .button{padding:11px 16px!important}
+  .hero .scroll-cue{bottom:2vh!important}
+}
+@media(max-width:800px){
+  .hero{height:100svh!important;min-height:680px!important}
+}
+
+
+
+/* v0.5.6 — Historical Discovery cinematic visual test */
+.discovery-feature{background:#090908;color:#f1e8d6;position:relative;overflow:hidden;padding:0}
+.discovery-intro{min-height:82vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:110px 8vw 80px;background:radial-gradient(circle at 50% 35%,rgba(168,129,63,.17),transparent 42%),#090908}
+.discovery-intro .inner{max-width:900px}
+.discovery-intro .kicker{color:#c8a25d}
+.discovery-intro h2{font-size:clamp(3rem,7vw,7rem);line-height:.92;margin:.16em 0 .22em}
+.discovery-intro p{max-width:690px;margin:0 auto;font-size:clamp(1.05rem,1.5vw,1.3rem);line-height:1.6;color:#d8cfbf}
+.discovery-intro .enter{display:inline-block;margin-top:28px;color:#e7c77e;letter-spacing:.12em;font-size:.8rem}
+.story-scene{min-height:92vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:7vw;padding:10vh 8vw;border-top:1px solid rgba(231,199,126,.13);position:relative}
+.story-scene:nth-child(even){background:#11100e}
+.story-scene:nth-child(odd){background:#0b0b0a}
+.story-scene .scene-no{font-size:.72rem;letter-spacing:.18em;color:#c8a25d;margin-bottom:18px}
+.story-scene h3{font-size:clamp(2.3rem,4.8vw,5.4rem);line-height:.98;margin:0 0 24px;max-width:760px}
+.story-scene p{font-size:clamp(1rem,1.35vw,1.2rem);line-height:1.7;color:#d7d0c3;max-width:650px}
+.story-scene .visual{aspect-ratio:4/5;border:1px solid rgba(231,199,126,.24);position:relative;overflow:hidden;background:linear-gradient(145deg,#2c261d,#0b0b0a 62%);box-shadow:0 28px 80px rgba(0,0,0,.42)}
+.story-scene .visual:before,.story-scene .visual:after{content:"";position:absolute;border:1px solid rgba(231,199,126,.18)}
+.story-scene .visual:before{inset:8% 10% 34%;transform:rotate(-2deg);background:linear-gradient(135deg,rgba(231,199,126,.09),rgba(255,255,255,.015))}
+.story-scene .visual:after{inset:39% 18% 9% 14%;transform:rotate(2deg);background:linear-gradient(135deg,rgba(255,255,255,.035),rgba(231,199,126,.04))}
+.visual .stamp{position:absolute;z-index:2;left:10%;bottom:10%;right:10%;font-family:Georgia,serif;font-size:clamp(1.5rem,3vw,3.5rem);line-height:1;color:#eadbbd;text-transform:uppercase}
+.visual .micro{position:absolute;z-index:2;left:11%;top:11%;font-size:.66rem;letter-spacing:.16em;color:#c8a25d}
+.evidence-band{padding:90px 8vw;background:#e9dfcc;color:#16130f;text-align:center}
+.evidence-band h3{font-size:clamp(2.2rem,4vw,4.5rem);margin:.15em auto;max-width:900px}
+.evidence-band p{max-width:760px;margin:20px auto;line-height:1.7}
+.evidence-band .prototype-warning{font-size:.78rem;letter-spacing:.06em;border-top:1px solid rgba(22,19,15,.22);padding-top:22px;margin-top:34px}
+.history-community{min-height:78vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:100px 8vw;background:radial-gradient(circle at 50% 30%,rgba(168,129,63,.16),transparent 42%),#080807;color:#f3ead9}
+.history-community .inner{max-width:850px}.history-community h3{font-size:clamp(2.7rem,6vw,6.5rem);line-height:.95;margin:.15em 0}.history-community p{font-size:1.1rem;line-height:1.65;color:#d6cebf;max-width:680px;margin:0 auto 28px}
+.story-scene.reveal-story{opacity:.16;transform:translateY(70px);transition:opacity .9s ease,transform .9s ease}.story-scene.reveal-story.in{opacity:1;transform:none}
+@media(max-width:800px){.story-scene{grid-template-columns:1fr;min-height:auto;padding:90px 7vw}.story-scene .visual{max-height:66vh}.discovery-intro{min-height:75vh}}
+@media(prefers-reduced-motion:reduce){.story-scene.reveal-story{opacity:1;transform:none;transition:none}}
+
+
+/* v0.5.6 — cinematic visual payoff test */
+.story-scene .visual.cinematic{aspect-ratio:16/10;background:#080807;border-color:rgba(231,199,126,.34)}
+.story-scene .visual.cinematic:before,.story-scene .visual.cinematic:after{display:none}
+.story-scene .visual.cinematic img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.025);transition:transform 1.4s cubic-bezier(.2,.7,.2,1),filter 1s ease;filter:saturate(.88) contrast(1.04)}
+.story-scene.in .visual.cinematic img{transform:scale(1)}
+.story-scene .visual.cinematic .visual-label{position:absolute;z-index:3;left:18px;bottom:16px;padding:8px 10px;background:rgba(5,5,4,.76);border:1px solid rgba(231,199,126,.38);font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:#eadbbd;backdrop-filter:blur(6px)}
+.story-scene .visual.cinematic .visual-vignette{position:absolute;inset:0;z-index:2;box-shadow:inset 0 0 90px rgba(0,0,0,.42);pointer-events:none}
+.story-scene:nth-of-type(2) .visual.cinematic,.story-scene:nth-of-type(4) .visual.cinematic{transform:rotate(.35deg)}
+@media(min-width:1000px){.story-scene .visual.cinematic{width:112%;margin-left:-6%}.story-scene:nth-of-type(3) .visual.cinematic{width:116%;margin-left:-8%}}
+
+</style></head>
+<body>
+<header class="site-header">
+  <a class="brand" href="#top">BLACK CONTINUITY</a>
+  <nav>
+    <a href="#history">Discover History</a>
+    <a href="#community">Community</a>
+    <a href="#books">Books & Collections</a>
+    <a href="#research">Research & Sources</a>
+    <a href="#join">Join</a>
+  </nav>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">● BLACK CONTINUITY IS IN PRODUCTION</div>
+    <h1><span>BLACK</span> <span>CONTINUITY</span></h1>
+    <p class="hero-line">Bringing overlooked Black history back into view.</p>
+    <p class="hero-copy">Black Continuity is in production now. Explore the history, follow the work, and watch the publishing program grow. You’re here early. Be Here From the Beginning.</p>
+    <div class="actions"><a class="button" href="#featured-discovery">EXPLORE HISTORY</a><a class="button secondary" href="#join">JOIN BLACK CONTINUITY</a></div>
+    <div class="scroll-cue">↓ DISCOVER WHAT WE’RE BUILDING</div>
+  </div>
+</section>
+
+<section class="paper intro reveal">
+  <div class="kicker">YOU’RE EARLY</div>
+  <h2>History. Community. Publishing.</h2>
+  <p class="lead">Black Continuity is being built as a permanent home for discovering Black history, connecting through it, preserving stories, and following new books and collections from research to publication.</p>
+  <div class="three">
+    <article><h3>HISTORY</h3><p>Discover overlooked people, places, events and communities. Ask questions. Follow the evidence. Keep learning.</p></article>
+    <article><h3>COMMUNITY</h3><p>Connect with people who care about Black history. Discuss, ask, share and learn in a welcoming, moderated space.</p></article>
+    <article><h3>PUBLISHING</h3><p>Watch Black Continuity grow from research and production into volumes, four-volume sets and an expanding catalog.</p></article>
+  </div>
+</section>
+
+
+<section class="discovery-feature" id="featured-discovery">
+  <div class="discovery-intro">
+    <div class="inner">
+      <div class="kicker">FEATURED HISTORICAL DISCOVERY · PROTOTYPE</div>
+      <h2>What happens when you follow the money?</h2>
+      <p>This first Black Continuity visual-story test explores Britain’s slave-trade financial network and the compensation system that followed abolition. The purpose of this prototype is to test the storytelling experience before final historical research and source selection are installed.</p>
+      <span class="enter">SCROLL TO ENTER THE STORY ↓</span>
+    </div>
+  </div>
+
+  <article class="story-scene reveal-story">
+    <div><div class="scene-no">01 · THE QUESTION</div><h3>Abolition Ended Slavery. But Who Was Compensated?</h3><p>The story begins with a question rather than a wall of text. One idea fills the screen and gives the visitor a reason to continue.</p></div>
+    <div class="visual cinematic"><img src="discovery_scene_01_concept.png" alt="Conceptual visual study combining Westminster and an abolition-era document"><span class="visual-vignette"></span><span class="visual-label">CONCEPT VISUAL · FINAL SOURCES TO BE VERIFIED</span></div>
+  </article>
+
+  <article class="story-scene reveal-story">
+    <div class="visual cinematic"><img src="discovery_scene_02_concept.png" alt="Conceptual close-up of a historical compensation ledger"><span class="visual-vignette"></span><span class="visual-label">CONCEPT VISUAL · NOT A PRIMARY-SOURCE RECORD</span></div>
+    <div><div class="scene-no">02 · SHOW HOW WE KNOW</div><h3>Bring the Evidence Into the Story.</h3><p>Instead of asking visitors to simply trust the narration, the finished experience can reveal registers, parliamentary records, ledgers, maps and other appropriate historical sources as the story unfolds.</p></div>
+  </article>
+
+  <article class="story-scene reveal-story">
+    <div><div class="scene-no">03 · PEOPLE & INSTITUTIONS</div><h3>Move From the System to the People Inside It.</h3><p>Each verified connection can become its own visual chapter: a person, company, institution or place, followed by the evidence that supports the connection.</p></div>
+    <div class="visual cinematic"><img src="discovery_scene_03_concept.png" alt="Conceptual montage representing people and institutions in a historical network"><span class="visual-vignette"></span><span class="visual-label">CONCEPTUAL RECONSTRUCTION · NOT DOCUMENTARY EVIDENCE</span></div>
+  </article>
+
+  <article class="story-scene reveal-story">
+    <div class="visual cinematic"><img src="discovery_scene_04_concept.png" alt="Conceptual reconstruction contrasting recipients of compensation with formerly enslaved people who did not receive that compensation"><span class="visual-vignette"></span><span class="visual-label">CONCEPTUAL RECONSTRUCTION · FINAL HISTORICAL CLAIMS TO BE VERIFIED</span></div>
+    <div><div class="scene-no">04 · THE TURN</div><h3>The Compensation Story Changes the Question.</h3><p>The completed BCPG version will distinguish documented fact, interpretation and qualification while showing what the records establish about compensation after abolition.</p></div>
+  </article>
+
+  <div class="evidence-band">
+    <div class="kicker">BCPG EVIDENCE-FIRST STORYTELLING</div>
+    <h3>The Story Follows the Evidence. The Evidence Does Not Follow the Story.</h3>
+    <p>In the finished Historical Discovery, every publishable historical claim will be independently researched and verified. Sources, uncertainty and qualifications will remain part of the experience rather than being hidden behind the animation.</p>
+    <div class="prototype-warning">PROTOTYPE NOTE: THESE SCENES TEST PACING, VISUAL HIERARCHY AND THE HISTORY-TO-COMMUNITY JOURNEY. THEY ARE NOT THE FINAL RESEARCHED ARTICLE.</div>
+  </div>
+
+  <div class="history-community">
+    <div class="inner">
+      <div class="kicker">HISTORY → COMMUNITY</div>
+      <h3>Keep Discovering With Us.</h3>
+      <p>Black Continuity is active and growing. Historical discovery has already begun, while our collections and community are taking shape. You’re here early. Join from the beginning.</p>
+      <div class="actions"><a class="button" href="#join">JOIN BLACK CONTINUITY</a><a class="button secondary" href="#history">EXPLORE MORE HISTORY</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="dark journey reveal">
+  <div class="kicker">WATCH BLACK CONTINUITY BEING BUILT</div>
+  <h2>From Discovery to Publication.</h2>
+  <div class="steps"><span>DISCOVERY</span><b>→</b><span>RESEARCH</span><b>→</b><span>VERIFICATION</span><b>→</b><span>WRITING &amp; PRODUCTION</span><b>→</b><span>PUBLICATION</span></div>
+  <p>This public journey shows the care behind the work without exposing Black Continuity’s private operating system.</p>
+</section>
+
+<section class="paper reveal" id="history">
+  <div class="kicker">DISCOVER HISTORY</div>
+  <h2>Stories Worth Bringing Back Into View.</h2>
+  <div class="cards reveal-stagger">
+    <article><div class="num">01</div><h3>People</h3><p>Lives, leadership, resistance, achievement and experiences too often pushed to the margins.</p></article>
+    <article><div class="num">02</div><h3>Places & Communities</h3><p>Explore the communities, institutions and places where Black history unfolded.</p></article>
+    <article><div class="num">03</div><h3>Events & Movements</h3><p>Discover events in context, with evidence, uncertainty and sources treated seriously.</p></article>
+  </div>
+  <p class="note">Historical articles and BCPG Historical Briefs will be added from authorized, source-conscious material as the site develops.</p>
+</section>
+
+<section class="collections reveal" id="books">
+  <div class="kicker">WHAT WE’RE BUILDING</div>
+  <h2>Collections Taking Shape.</h2>
+  <p class="collection-subline">Real histories. Lasting impact.</p>
+  <div class="collection-grid reveal-stagger">
+    <article><span>COLLECTION</span><h3>Hidden Black History: U.S.</h3><p>An expanding publishing program exploring overlooked chapters of Black history in the United States.</p></article>
+    <article><span>COLLECTION</span><h3>Caribbean &amp; West Indies</h3><p>History across islands, nations, communities and the wider Black Atlantic.</p></article>
+    <article><span>COLLECTION</span><h3>Black Massacre History</h3><p>Documenting histories of racial violence with context, evidence and care.</p></article>
+    <article><span>COLLECTION</span><h3>Black Continuity Fiction</h3><p>A future creative publishing direction within the wider Black Continuity catalog.</p></article>
+  </div>
+</section>
+
+<section class="paper community reveal" id="community">
+  <div class="kicker">BLACK CONTINUITY COMMUNITY</div>
+  <h2>History Should Start Conversations.</h2>
+  <p class="community-subline">Come for the history. Stay for the conversation.</p>
+  <div class="kicker" style="margin-top:24px">A PLACE TO CONNECT THROUGH HISTORY</div>
+  <p class="lead">The Black Continuity community is taking shape for people who care about Black history. It will be a moderated place to meet, exchange perspectives, ask questions, share stories and disagree respectfully without harassment or abuse.</p>
+  <div class="community-grid reveal-stagger">
+    <article><h3>DISCUSS BLACK HISTORY</h3><p>Talk about people, events, communities, books, sources and historical questions with others who share the interest.</p></article>
+    <article><h3>WHAT HISTORY DO YOU WANT TO KNOW?</h3><p>Members can ask about a person, place, event, community, time period, country or historical question they want explored.</p></article>
+    <article><h3>WHAT SHOULD BLACK CONTINUITY EXPLORE?</h3><p>Suggest subjects you believe deserve deeper attention. Community interest can inform review without automatically deciding what BCPG publishes.</p></article>
+    <article><h3>WHAT BLACK STORY DO YOU WANT TO TELL?</h3><p>Share a family or community story, migration, neighborhood, military experience, institution, photograph, document or memory you do not want forgotten.</p></article>
+  </div>
+  <div class="manifesto"><strong>DISCOVER IT. DISCUSS IT. ASK ABOUT IT. SHARE IT. PRESERVE IT.</strong></div>
+</section>
+
+<section class="dark signal reveal">
+  <div class="kicker">COMMUNITY + HISTORICAL INTEGRITY</div>
+  <h2>Your Voice Matters. Evidence Still Matters.</h2>
+  <p>A community story, question or popular topic can be valuable without automatically becoming verified BCPG history or a publishing decision. Contributions can reveal interests and possible research opportunities; any BCPG historical or publishing use requires the appropriate review, permissions, rights and verification.</p>
+</section>
+
+<section class="paper membership reveal" id="join">
+  <div class="kicker">JOIN BLACK CONTINUITY</div>
+  <h2>Be Here From the Beginning.</h2>
+  <p class="lead">One membership. Many reasons to join. Discover overlooked history now, follow books and collections as they develop, and be here as the community takes shape. Ask questions, suggest topics and share Black stories you don’t want forgotten.</p>
+  <div class="benefits">
+    <span>First word on books &amp; collections</span><span>Historical discoveries</span><span>Community access</span><span>Historical questions</span><span>Topic suggestions</span><span>Story sharing</span>
+  </div>
+  <form class="join-form" onsubmit="event.preventDefault(); document.getElementById('thanks').hidden=false;">
+    <input aria-label="First name" placeholder="First name">
+    <input aria-label="Email address" type="email" placeholder="Email address" required>
+    <button type="submit">I WANT IN →</button>
+  </form>
+  <p id="thanks" hidden><strong>YOU’RE IN.</strong> Welcome to Black Continuity. <em>Prototype only. No information was transmitted.</em></p>
+  <p class="fine">Prototype form only. No information is transmitted or stored.</p>
+</section>
+
+<section class="research reveal" id="research">
+  <div class="kicker">RESEARCH &amp; SOURCES</div>
+  <h2>Trust Should Be Earned.</h2>
+  <p>Black Continuity’s public work is intended to distinguish evidence from uncertainty, provide appropriate context and sourcing, correct mistakes when needed, and keep marketing aligned with the underlying history.</p>
+  <p class="rule">SHOW THE EVIDENCE DISCIPLINE. PROTECT THE OPERATING SYSTEM.</p>
+</section>
+
+<section class="paper final reveal">
+  <div class="kicker">THE BLACK CONTINUITY JOURNEY</div>
+  <h2>Discover → Connect → Preserve → Publish → Continue.</h2>
+  <p class="lead">Black Continuity is being built for the long term. History, community and the publishing catalog will grow together here.</p>
+  <a class="button darkbutton" href="#join">JOIN BLACK CONTINUITY →</a>
+</section>
+</main>
+
+<footer><strong>BLACK CONTINUITY PUBLISHING GROUP</strong><span>Prototype v0.5.11 | Public Copy Human-Language Pass</span></footer>
+
+<script>
+(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const header = document.querySelector('.site-header');
+  const hero = document.querySelector('.hero');
+  const heroInner = document.querySelector('.hero-inner');
+  const revealNodes = document.querySelectorAll('.reveal, .reveal-stagger');
+
+  if ('IntersectionObserver' in window && !reduce) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+    revealNodes.forEach(node => observer.observe(node));
+  } else {
+    revealNodes.forEach(node => node.classList.add('is-visible'));
+  }
+
+  const onScroll = () => {
+    const y = window.scrollY || 0;
+    header.classList.toggle('scrolled', y > 40);
+    if (!reduce && hero && heroInner && y < window.innerHeight * 1.15) {
+      const p = Math.min(y / window.innerHeight, 1);
+      heroInner.style.transform = `translate3d(0, ${p * -26}px, 0)`;
+      heroInner.style.opacity = String(1 - p * .82);
+      hero.style.backgroundPosition = `center calc(50% + ${p * 34}px)`;
+    }
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, {passive:true});
+})();
+</script>
+
+
+<script>
+const storyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{ if(entry.isIntersecting) entry.target.classList.add('in'); });
+},{threshold:.22});
+document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el));
+</script>
+
+</body></html>
