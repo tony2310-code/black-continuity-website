@@ -193,18 +193,16 @@ body{overflow-x:hidden}
 @media(min-width:1000px){.story-scene .visual.cinematic{width:112%;margin-left:-6%}.story-scene:nth-of-type(3) .visual.cinematic{width:116%;margin-left:-8%}}
 
 
-/* Carry It Forward — opt-in site soundtrack */
-.bc-audio{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:1000;display:flex;align-items:center;gap:7px;padding:7px 9px;background:rgba(8,8,7,.92);border:1px solid rgba(201,155,69,.7);box-shadow:0 8px 28px rgba(0,0,0,.38);backdrop-filter:blur(10px);font-family:Arial,sans-serif;color:#f7f1e5}
-.bc-audio button{appearance:none;border:0;background:transparent;color:inherit;cursor:pointer;padding:0;text-align:left}
-.bc-audio .bc-audio-main{display:flex;align-items:center;gap:9px;min-width:0}
-.bc-audio .bc-audio-icon{width:22px;height:22px;border:1px solid #c99b45;border-radius:50%;display:grid;place-items:center;color:#e4c47e;font-size:9px;flex:0 0 auto}
-.bc-audio .bc-audio-copy{display:block;line-height:1.05;white-space:nowrap}
-.bc-audio .bc-audio-title{display:block;font-size:8px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#e4c47e}
-.bc-audio .bc-audio-state{display:block;margin-top:3px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b8ae9b}
-.bc-audio input[type="range"]{width:52px;accent-color:#c99b45;cursor:pointer}
-.bc-audio:focus-within{outline:1px solid #e4c47e;outline-offset:2px}
-@media(max-width:620px){.bc-audio{left:50%;top:10px;right:auto;bottom:auto;transform:translateX(-50%);padding:6px 8px}.bc-audio input[type="range"]{width:46px}.bc-audio .bc-audio-title{max-width:118px;overflow:hidden;text-overflow:ellipsis}}
-
+/* Carry It Forward — cinematic opt-in soundtrack */
+.bc-audio{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:1000;font-family:Arial,sans-serif;color:#f7f1e5}
+.bc-audio button{appearance:none;cursor:pointer;color:inherit;background:rgba(8,8,7,.92);border:1px solid rgba(201,155,69,.72);box-shadow:0 8px 28px rgba(0,0,0,.38);backdrop-filter:blur(10px)}
+.bc-audio-intro{display:flex;align-items:center;gap:8px;padding:7px 10px;transition:opacity .8s ease,transform .8s ease}
+.bc-audio-intro.is-gone{opacity:0;transform:translateY(-8px);pointer-events:none}
+.bc-audio-mini{position:absolute;left:50%;top:0;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;opacity:0;pointer-events:none;transition:opacity .8s ease}
+.bc-audio-mini.is-visible{opacity:1;pointer-events:auto}
+.bc-audio-title{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#e4c47e;white-space:nowrap}
+.bc-audio-prompt{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#b8ae9b;white-space:nowrap}
+@media(max-width:620px){.bc-audio{top:10px}.bc-audio-intro{padding:6px 8px}.bc-audio-title,.bc-audio-prompt{font-size:7px}}
 </style></head>
 <body>
 <header class="site-header">
@@ -373,12 +371,12 @@ body{overflow-x:hidden}
 
 
 <div class="bc-audio" role="group" aria-label="Carry It Forward soundtrack controls">
-  <audio id="bcSoundtrack" src="Carry%20It%20Forward.mp3" preload="metadata" loop></audio>
-  <button class="bc-audio-main" id="bcAudioToggle" type="button" aria-pressed="false" aria-label="Play Carry It Forward">
-    <span class="bc-audio-icon" id="bcAudioIcon" aria-hidden="true">▶</span>
-    <span class="bc-audio-copy"><span class="bc-audio-title">Carry It Forward</span><span class="bc-audio-state" id="bcAudioState">Sound Off</span></span>
+  <audio id="bcSoundtrack" src="Carry%20It%20Forward.mp3" preload="metadata"></audio>
+  <button class="bc-audio-intro" id="bcAudioIntro" type="button" aria-label="Play Carry It Forward">
+    <span class="bc-audio-title">Carry It Forward</span>
+    <span class="bc-audio-prompt">▶ Play Sound</span>
   </button>
-  <input id="bcAudioVolume" type="range" min="0" max="1" step="0.05" value="0.28" aria-label="Soundtrack volume">
+  <button class="bc-audio-mini" id="bcAudioToggle" type="button" aria-pressed="false" aria-label="Turn sound on" title="Sound on/off">🔇</button>
 </div>
 
 <footer><strong>BLACK CONTINUITY PUBLISHING GROUP</strong><span>Prototype v0.5.16 | Every Heading Word Capitalized</span></footer>
@@ -432,30 +430,29 @@ document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el)
 <script>
 (() => {
   const audio = document.getElementById('bcSoundtrack');
+  const intro = document.getElementById('bcAudioIntro');
   const toggle = document.getElementById('bcAudioToggle');
-  const icon = document.getElementById('bcAudioIcon');
-  const state = document.getElementById('bcAudioState');
-  const volume = document.getElementById('bcAudioVolume');
-  if (!audio || !toggle || !volume) return;
+  if (!audio || !intro || !toggle) return;
 
-  const targetVolume = () => Number(volume.value);
+  const targetVolume = .28;
   audio.volume = 0;
+  let fadeTimer;
+  let collapseTimer;
 
-  const render = (playing) => {
+  const render = () => {
+    const playing = !audio.paused && !audio.ended;
+    toggle.textContent = playing ? '🔊' : '🔇';
     toggle.setAttribute('aria-pressed', String(playing));
-    toggle.setAttribute('aria-label', playing ? 'Pause Carry It Forward' : 'Play Carry It Forward');
-    icon.textContent = playing ? '❚❚' : '▶';
-    state.textContent = playing ? 'Sound On' : 'Sound Off';
+    toggle.setAttribute('aria-label', playing ? 'Turn sound off' : 'Turn sound on');
   };
 
-  let fadeTimer;
   const fadeTo = (to, ms = 650, after) => {
     clearInterval(fadeTimer);
     const from = audio.volume;
     const steps = 20;
     let step = 0;
     fadeTimer = setInterval(() => {
-      step += 1;
+      step++;
       audio.volume = Math.max(0, Math.min(1, from + (to - from) * (step / steps)));
       if (step >= steps) {
         clearInterval(fadeTimer);
@@ -464,27 +461,42 @@ document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el)
     }, ms / steps);
   };
 
+  const collapse = () => {
+    clearTimeout(collapseTimer);
+    intro.classList.add('is-gone');
+    setTimeout(() => toggle.classList.add('is-visible'), 350);
+  };
+
+  const start = async () => {
+    if (audio.ended) audio.currentTime = 0;
+    audio.volume = 0;
+    try {
+      await audio.play();
+      render();
+      fadeTo(targetVolume);
+      collapseTimer = setTimeout(collapse, 1800);
+    } catch (_) {
+      render();
+    }
+  };
+
+  intro.addEventListener('click', start);
   toggle.addEventListener('click', async () => {
-    if (audio.paused) {
-      audio.volume = 0;
-      try {
-        await audio.play();
-        render(true);
-        fadeTo(targetVolume());
-      } catch (_) {
-        render(false);
-      }
+    if (audio.paused || audio.ended) {
+      await start();
+      toggle.classList.add('is-visible');
     } else {
-      fadeTo(0, 400, () => { audio.pause(); render(false); });
+      fadeTo(0, 350, () => { audio.pause(); render(); });
     }
   });
 
-  volume.addEventListener('input', () => {
-    if (!audio.paused) audio.volume = targetVolume();
+  audio.addEventListener('play', render);
+  audio.addEventListener('pause', render);
+  audio.addEventListener('ended', () => {
+    audio.volume = 0;
+    render();
   });
-  audio.addEventListener('pause', () => render(false));
-  audio.addEventListener('play', () => render(true));
-  render(false);
+  render();
 })();
 </script>
 
