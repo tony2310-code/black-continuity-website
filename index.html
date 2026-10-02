@@ -192,6 +192,19 @@ body{overflow-x:hidden}
 .story-scene:nth-of-type(2) .visual.cinematic,.story-scene:nth-of-type(4) .visual.cinematic{transform:rotate(.35deg)}
 @media(min-width:1000px){.story-scene .visual.cinematic{width:112%;margin-left:-6%}.story-scene:nth-of-type(3) .visual.cinematic{width:116%;margin-left:-8%}}
 
+
+/* Carry It Forward — opt-in site soundtrack */
+.bc-audio{position:fixed;right:18px;bottom:18px;z-index:1000;display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(8,8,7,.92);border:1px solid rgba(201,155,69,.7);box-shadow:0 8px 28px rgba(0,0,0,.38);backdrop-filter:blur(10px);font-family:Arial,sans-serif;color:#f7f1e5}
+.bc-audio button{appearance:none;border:0;background:transparent;color:inherit;cursor:pointer;padding:0;text-align:left}
+.bc-audio .bc-audio-main{display:flex;align-items:center;gap:9px;min-width:0}
+.bc-audio .bc-audio-icon{width:28px;height:28px;border:1px solid #c99b45;border-radius:50%;display:grid;place-items:center;color:#e4c47e;font-size:12px;flex:0 0 auto}
+.bc-audio .bc-audio-copy{display:block;line-height:1.05;white-space:nowrap}
+.bc-audio .bc-audio-title{display:block;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#e4c47e}
+.bc-audio .bc-audio-state{display:block;margin-top:4px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b8ae9b}
+.bc-audio input[type="range"]{width:72px;accent-color:#c99b45;cursor:pointer}
+.bc-audio:focus-within{outline:1px solid #e4c47e;outline-offset:2px}
+@media(max-width:620px){.bc-audio{right:10px;bottom:10px;padding:9px 10px}.bc-audio input[type="range"]{width:54px}.bc-audio .bc-audio-title{max-width:118px;overflow:hidden;text-overflow:ellipsis}}
+
 </style></head>
 <body>
 <header class="site-header">
@@ -358,6 +371,16 @@ body{overflow-x:hidden}
 </section>
 </main>
 
+
+<div class="bc-audio" role="group" aria-label="Carry It Forward soundtrack controls">
+  <audio id="bcSoundtrack" src="Carry%20It%20Forward.mp3" preload="metadata" loop></audio>
+  <button class="bc-audio-main" id="bcAudioToggle" type="button" aria-pressed="false" aria-label="Play Carry It Forward">
+    <span class="bc-audio-icon" id="bcAudioIcon" aria-hidden="true">▶</span>
+    <span class="bc-audio-copy"><span class="bc-audio-title">Carry It Forward</span><span class="bc-audio-state" id="bcAudioState">Sound Off</span></span>
+  </button>
+  <input id="bcAudioVolume" type="range" min="0" max="1" step="0.05" value="0.28" aria-label="Soundtrack volume">
+</div>
+
 <footer><strong>BLACK CONTINUITY PUBLISHING GROUP</strong><span>Prototype v0.5.16 | Every Heading Word Capitalized</span></footer>
 
 <script>
@@ -403,6 +426,66 @@ const storyObserver = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{ if(entry.isIntersecting) entry.target.classList.add('in'); });
 },{threshold:.22});
 document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el));
+</script>
+
+
+<script>
+(() => {
+  const audio = document.getElementById('bcSoundtrack');
+  const toggle = document.getElementById('bcAudioToggle');
+  const icon = document.getElementById('bcAudioIcon');
+  const state = document.getElementById('bcAudioState');
+  const volume = document.getElementById('bcAudioVolume');
+  if (!audio || !toggle || !volume) return;
+
+  const targetVolume = () => Number(volume.value);
+  audio.volume = 0;
+
+  const render = (playing) => {
+    toggle.setAttribute('aria-pressed', String(playing));
+    toggle.setAttribute('aria-label', playing ? 'Pause Carry It Forward' : 'Play Carry It Forward');
+    icon.textContent = playing ? '❚❚' : '▶';
+    state.textContent = playing ? 'Sound On' : 'Sound Off';
+  };
+
+  let fadeTimer;
+  const fadeTo = (to, ms = 650, after) => {
+    clearInterval(fadeTimer);
+    const from = audio.volume;
+    const steps = 20;
+    let step = 0;
+    fadeTimer = setInterval(() => {
+      step += 1;
+      audio.volume = Math.max(0, Math.min(1, from + (to - from) * (step / steps)));
+      if (step >= steps) {
+        clearInterval(fadeTimer);
+        if (after) after();
+      }
+    }, ms / steps);
+  };
+
+  toggle.addEventListener('click', async () => {
+    if (audio.paused) {
+      audio.volume = 0;
+      try {
+        await audio.play();
+        render(true);
+        fadeTo(targetVolume());
+      } catch (_) {
+        render(false);
+      }
+    } else {
+      fadeTo(0, 400, () => { audio.pause(); render(false); });
+    }
+  });
+
+  volume.addEventListener('input', () => {
+    if (!audio.paused) audio.volume = targetVolume();
+  });
+  audio.addEventListener('pause', () => render(false));
+  audio.addEventListener('play', () => render(true));
+  render(false);
+})();
 </script>
 
 </body></html>
