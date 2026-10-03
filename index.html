@@ -220,16 +220,12 @@ body{overflow-x:hidden}
 @media(min-width:1000px){.story-scene .visual.cinematic{width:112%;margin-left:-6%}.story-scene:nth-of-type(3) .visual.cinematic{width:116%;margin-left:-8%}}
 
 
-/* Carry It Forward — cinematic opt-in soundtrack */
+/* Carry It Forward — first-interaction soundtrack + compact sound toggle */
 .bc-audio{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:1000;font-family:Arial,sans-serif;color:#f7f1e5}
 .bc-audio button{appearance:none;cursor:pointer;color:inherit;background:rgba(8,8,7,.92);border:1px solid rgba(201,155,69,.72);box-shadow:0 8px 28px rgba(0,0,0,.38);backdrop-filter:blur(10px)}
-.bc-audio-intro{display:flex;align-items:center;gap:8px;padding:7px 10px;transition:opacity .8s ease,transform .8s ease}
-.bc-audio-intro.is-gone{opacity:0;transform:translateY(-8px);pointer-events:none}
-.bc-audio-mini{position:absolute;left:50%;top:0;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;opacity:0;pointer-events:none;transition:opacity .8s ease}
-.bc-audio-mini.is-visible{opacity:1;pointer-events:auto}
-.bc-audio-title{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#e4c47e;white-space:nowrap}
-.bc-audio-prompt{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#b8ae9b;white-space:nowrap}
-@media(max-width:620px){.bc-audio{top:10px}.bc-audio-intro{padding:6px 8px}.bc-audio-title,.bc-audio-prompt{font-size:7px}}
+.bc-audio-mini{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:14px;opacity:1;pointer-events:auto;transition:opacity .25s ease,transform .25s ease}
+.bc-audio-mini:hover{transform:scale(1.06)}
+@media(max-width:620px){.bc-audio{top:10px}.bc-audio-mini{width:30px;height:30px;font-size:13px}}
 </style></head>
 <body>
 <header class="site-header">
@@ -398,13 +394,9 @@ body{overflow-x:hidden}
 </main>
 
 
-<div class="bc-audio" role="group" aria-label="Carry It Forward soundtrack controls">
+<div class="bc-audio" role="group" aria-label="Sound controls">
   <audio id="bcSoundtrack" src="Carry%20It%20Forward.mp3" preload="metadata"></audio>
-  <button class="bc-audio-intro" id="bcAudioIntro" type="button" aria-label="Play Carry It Forward">
-    <span class="bc-audio-title">Carry It Forward</span>
-    <span class="bc-audio-prompt">▶ Play Sound</span>
-  </button>
-  <button class="bc-audio-mini" id="bcAudioToggle" type="button" aria-pressed="false" aria-label="Turn sound on" title="Sound on/off">🔇</button>
+  <button class="bc-audio-mini is-visible" id="bcAudioToggle" type="button" aria-pressed="false" aria-label="Turn sound on" title="Sound on/off">🔇</button>
 </div>
 
 <footer><strong>BLACK CONTINUITY PUBLISHING GROUP</strong><span>Research · Publishing · Historical Discovery</span></footer>
@@ -458,14 +450,14 @@ document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el)
 <script>
 (() => {
   const audio = document.getElementById('bcSoundtrack');
-  const intro = document.getElementById('bcAudioIntro');
   const toggle = document.getElementById('bcAudioToggle');
-  if (!audio || !intro || !toggle) return;
+  if (!audio || !toggle) return;
 
   const targetVolume = .28;
-  audio.volume = 0;
   let fadeTimer;
-  let collapseTimer;
+  let hasStarted = false;
+
+  audio.volume = 0;
 
   const render = () => {
     const playing = !audio.paused && !audio.ended;
@@ -489,32 +481,42 @@ document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el)
     }, ms / steps);
   };
 
-  const collapse = () => {
-    clearTimeout(collapseTimer);
-    intro.classList.add('is-gone');
-    setTimeout(() => toggle.classList.add('is-visible'), 350);
-  };
-
   const start = async () => {
     if (audio.ended) audio.currentTime = 0;
     audio.volume = 0;
     try {
       await audio.play();
-      render();
+      hasStarted = true;
       fadeTo(targetVolume);
-      collapseTimer = setTimeout(collapse, 1800);
+      render();
+      return true;
     } catch (_) {
       render();
+      return false;
     }
   };
 
-  intro.addEventListener('click', start);
-  toggle.addEventListener('click', async () => {
+  const firstInteraction = async (event) => {
+    if (event && toggle.contains(event.target)) return;
+    const started = await start();
+    if (started) {
+      document.removeEventListener('pointerdown', firstInteraction, true);
+      document.removeEventListener('keydown', firstInteraction, true);
+    }
+  };
+
+  document.addEventListener('pointerdown', firstInteraction, true);
+  document.addEventListener('keydown', firstInteraction, true);
+
+  toggle.addEventListener('click', async (event) => {
+    event.stopPropagation();
     if (audio.paused || audio.ended) {
       await start();
-      toggle.classList.add('is-visible');
     } else {
-      fadeTo(0, 350, () => { audio.pause(); render(); });
+      fadeTo(0, 350, () => {
+        audio.pause();
+        render();
+      });
     }
   });
 
@@ -524,6 +526,7 @@ document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el)
     audio.volume = 0;
     render();
   });
+
   render();
 })();
 </script>
