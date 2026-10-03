@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /confirmed.html
+Disallow: /api/
+
+Sitemap: https://blackcontinuity.com/sitemap.xml
