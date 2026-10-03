@@ -345,13 +345,14 @@ body{overflow-x:hidden}
   <div class="benefits">
     <span>First word on books &amp; collections</span><span>Historical discoveries</span><span>Community access</span><span>Historical questions</span><span>Topic suggestions</span><span>Story sharing</span>
   </div>
-  <form class="join-form" onsubmit="event.preventDefault(); document.getElementById('thanks').hidden=false;">
-    <input aria-label="First name" placeholder="First name">
-    <input aria-label="Email address" type="email" placeholder="Email address" required>
-    <button type="submit">I WANT IN →</button>
+  <form class="join-form" id="bcpgJoinForm">
+    <input id="bcpgFirstName" name="firstName" aria-label="First name" placeholder="First name" autocomplete="given-name">
+    <input id="bcpgEmail" name="email" aria-label="Email address" type="email" placeholder="Email address" autocomplete="email" required>
+    <button id="bcpgJoinButton" type="submit">I WANT IN →</button>
   </form>
-  <p id="thanks" hidden><strong>YOU’RE IN.</strong> Welcome to Black Continuity. <em>Prototype only. No information was transmitted.</em></p>
-  <p class="fine">Prototype form only. No information is transmitted or stored.</p>
+  <p id="thanks" hidden><strong>CHECK YOUR EMAIL.</strong> We sent you a confirmation link. Your Black Continuity signup is complete after you confirm your email.</p>
+  <p id="joinError" class="fine" role="alert" hidden></p>
+  <p class="fine">Your signup is not complete until you confirm your email address.</p>
 </section>
 
 <section class="research reveal" id="research">
@@ -497,6 +498,58 @@ document.querySelectorAll('.reveal-story').forEach(el=>storyObserver.observe(el)
     render();
   });
   render();
+})();
+</script>
+
+
+<script>
+(() => {
+  const form = document.getElementById('bcpgJoinForm');
+  const firstName = document.getElementById('bcpgFirstName');
+  const email = document.getElementById('bcpgEmail');
+  const button = document.getElementById('bcpgJoinButton');
+  const thanks = document.getElementById('thanks');
+  const errorBox = document.getElementById('joinError');
+
+  if (!form || !email || !button || !thanks || !errorBox) return;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errorBox.hidden = true;
+    thanks.hidden = true;
+
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = 'SENDING…';
+
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          firstName: firstName ? firstName.value.trim() : '',
+          email: email.value.trim()
+        })
+      });
+
+      let data = {};
+      try { data = await response.json(); } catch (_) {}
+
+      if (!response.ok) {
+        throw new Error(data.error || 'We could not start your signup. Please try again.');
+      }
+
+      form.reset();
+      thanks.hidden = false;
+      thanks.scrollIntoView({behavior:'smooth', block:'nearest'});
+    } catch (error) {
+      errorBox.textContent = error && error.message ? error.message : 'We could not start your signup. Please try again.';
+      errorBox.hidden = false;
+    } finally {
+      button.disabled = false;
+      button.textContent = originalLabel;
+    }
+  });
 })();
 </script>
 
